@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { JWT_SECRET } from "../utils/config";
-import { verifyToken } from "../utils/jwt.js";
+import { verifyToken } from "../utils/jwt";
 import { JwtPayload, ParseResponseInterface } from "../types";
 
 // Auth Middleware

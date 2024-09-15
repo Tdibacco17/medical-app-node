@@ -17,6 +17,7 @@ const pool = new Pool({
         console.log('Timezone set to Buenos Aires');
 
         const createTablesQuery = `
+            -- Tabla de usuarios
             CREATE TABLE IF NOT EXISTS app.users (
                 id UUID PRIMARY KEY,
                 email VARCHAR(255) NOT NULL UNIQUE,
@@ -27,6 +28,7 @@ const pool = new Pool({
                 updated_at TIMESTAMPTZ DEFAULT NOW()
             );
 
+            -- Tabla de permisos
             CREATE TABLE IF NOT EXISTS app.permissions (
                 id TEXT PRIMARY KEY,
                 description TEXT,
@@ -34,12 +36,42 @@ const pool = new Pool({
                 updated_at TIMESTAMPTZ DEFAULT NOW()
             );
 
+            -- Tabla relacional entre usuarios y permisos
             CREATE TABLE IF NOT EXISTS app.users_permissions (
                 user_id UUID REFERENCES app.users(id) ON DELETE CASCADE,
                 permission_id TEXT REFERENCES app.permissions(id) ON DELETE CASCADE,
                 created_at TIMESTAMPTZ DEFAULT NOW(),
                 updated_at TIMESTAMPTZ DEFAULT NOW(),
                 PRIMARY KEY (user_id, permission_id)
+            );
+
+            -- Tabla de especialidades
+            CREATE TABLE IF NOT EXISTS app.specialties (
+                id UUID PRIMARY KEY,
+                description TEXT NOT NULL,
+                created_at TIMESTAMPTZ DEFAULT NOW(),
+                updated_at TIMESTAMPTZ DEFAULT NOW()
+            );
+
+            -- Tabla de doctores
+            CREATE TABLE IF NOT EXISTS app.doctors (
+                id UUID PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                lastname VARCHAR(255) NOT NULL,
+                email VARCHAR(255) NOT NULL,
+                phone VARCHAR(20),
+                dni VARCHAR(20) NOT NULL,
+                created_at TIMESTAMPTZ DEFAULT NOW(),
+                updated_at TIMESTAMPTZ DEFAULT NOW()
+            );
+
+            -- Tabla relacional entre especialidades y doctores
+            CREATE TABLE IF NOT EXISTS app.specialties_doctors (
+                specialty_id UUID REFERENCES app.specialties(id) ON DELETE CASCADE,
+                doctor_id UUID REFERENCES app.doctors(id) ON DELETE CASCADE,
+                created_at TIMESTAMPTZ DEFAULT NOW(),
+                updated_at TIMESTAMPTZ DEFAULT NOW(),
+                PRIMARY KEY (specialty_id, doctor_id)
             );
         `;
 

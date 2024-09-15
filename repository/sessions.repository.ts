@@ -5,7 +5,7 @@ import { tokenSign, verifyToken } from "../utils/jwt";
 import { v4 as uuidv4 } from 'uuid';
 
 // verifyToken
-export const repositorySessions = async (email: string, password: string) => {
+export const RepositorySessions = async (email: string, password: string) => {
     try {
         const query = `SELECT id, email, password FROM app.users WHERE email = $1;`
         const { rows: userRows } = await conn.query(query, [email]);
@@ -33,7 +33,7 @@ export const repositorySessions = async (email: string, password: string) => {
         if (tokenResponse.status && tokenResponse.status !== 200) return tokenResponse;
 
         return {
-            message: "Login successful", status: 200,
+            message: "Login successful.", status: 200,
             data: {
                 email: email,
                 token: tokenResponse.data,
@@ -45,7 +45,7 @@ export const repositorySessions = async (email: string, password: string) => {
     }
 };
 
-export const repositoryRefresh = async (token: string) => {
+export const RepositoryRefresh = async (token: string) => {
     try {
         const decodedTokenResponse = verifyToken(token);
 
@@ -73,7 +73,7 @@ export const repositoryRefresh = async (token: string) => {
         if (tokenRefreshResponse.status && tokenRefreshResponse.status !== 200) return tokenRefreshResponse;
 
         return {
-            message: "Token refreshed successfully",
+            message: "Token refreshed successfully.",
             status: 200,
             data: {
                 email: email,
@@ -86,12 +86,12 @@ export const repositoryRefresh = async (token: string) => {
     }
 };
 
-export const repositoryCreate = async (email: string, password: string) => {
+export const RepositoryCreateUser = async (email: string, password: string) => {
     try {
         const checkUserQuery = `SELECT id FROM app.users WHERE email = $1;`;
         const { rows: existingUser } = await conn.query(checkUserQuery, [email]);
 
-        if (existingUser.length > 0) return { message: 'User already exists with the provided email.', status: 400 };
+        if (existingUser.length > 0) return { message: 'User already exists with the provided email.', status: 409 };
 
         const query = `INSERT INTO app.users(id, email, password) VALUES ($1, $2, $3) RETURNING *;`
 
@@ -112,7 +112,7 @@ export const repositoryCreate = async (email: string, password: string) => {
         const { rowCount: assignRoleResult } = await conn.query(assignRoleQuery, assignRoleValues);
         if (assignRoleResult === 0) console.warn('Role assignment did not insert any rows. This may indicate the role was already assigned.');
 
-        return userCreate[0];
+        return { message: `User created successfully.`, status: 200, data: userCreate[0] };
     } catch (e: any) {
         return { message: `[Internal Server Error]: ${e.message}`, status: 500 };
     }
