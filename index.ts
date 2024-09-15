@@ -4,6 +4,8 @@ import cors from "cors";
 import { connectDb } from './database/db';
 import { PORT } from './utils/config';
 import { router as sessionsRoutes } from "./routes/sessions.routes";
+import { router as specialitesRoutes } from "./routes/specialty.routes";
+import { router as doctorsRoutes } from "./routes/doctor.routes";
 
 const server = express();
 
@@ -16,8 +18,8 @@ server.use(cors());
 // Routes
 server.use('/api', sessionsRoutes);
 // server.use('/api', patientsRoutes);
-// server.use('/api', doctorsRoutes);
-// server.use('/api', specialitesRoutes);
+server.use('/api', doctorsRoutes);
+server.use('/api', specialitesRoutes);
 
 // Start server
 (async () => {

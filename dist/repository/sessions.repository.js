@@ -12,13 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.repositoryCreate = exports.repositoryRefresh = exports.repositorySessions = void 0;
+exports.RepositoryCreateUser = exports.RepositoryRefresh = exports.RepositorySessions = void 0;
 const db_1 = __importDefault(require("../database/db"));
 const bcrypt_1 = require("../utils/bcrypt");
 const jwt_1 = require("../utils/jwt");
 const uuid_1 = require("uuid");
 // verifyToken
-const repositorySessions = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
+const RepositorySessions = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const query = `SELECT id, email, password FROM app.users WHERE email = $1;`;
         const { rows: userRows } = yield db_1.default.query(query, [email]);
@@ -40,7 +40,7 @@ const repositorySessions = (email, password) => __awaiter(void 0, void 0, void 0
         if (tokenResponse.status && tokenResponse.status !== 200)
             return tokenResponse;
         return {
-            message: "Login successful", status: 200,
+            message: "Login successful.", status: 200,
             data: {
                 email: email,
                 token: tokenResponse.data,
@@ -52,8 +52,8 @@ const repositorySessions = (email, password) => __awaiter(void 0, void 0, void 0
         return { message: `[Internal Server Error]: ${e.message}`, status: 500 };
     }
 });
-exports.repositorySessions = repositorySessions;
-const repositoryRefresh = (token) => __awaiter(void 0, void 0, void 0, function* () {
+exports.RepositorySessions = RepositorySessions;
+const RepositoryRefresh = (token) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const decodedTokenResponse = (0, jwt_1.verifyToken)(token);
         if (decodedTokenResponse.status && decodedTokenResponse.status !== 200)
@@ -76,7 +76,7 @@ const repositoryRefresh = (token) => __awaiter(void 0, void 0, void 0, function*
         if (tokenRefreshResponse.status && tokenRefreshResponse.status !== 200)
             return tokenRefreshResponse;
         return {
-            message: "Token refreshed successfully",
+            message: "Token refreshed successfully.",
             status: 200,
             data: {
                 email: email,
@@ -89,13 +89,13 @@ const repositoryRefresh = (token) => __awaiter(void 0, void 0, void 0, function*
         return { message: `[Internal Server Error]: ${e.message}`, status: 500 };
     }
 });
-exports.repositoryRefresh = repositoryRefresh;
-const repositoryCreate = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
+exports.RepositoryRefresh = RepositoryRefresh;
+const RepositoryCreateUser = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const checkUserQuery = `SELECT id FROM app.users WHERE email = $1;`;
         const { rows: existingUser } = yield db_1.default.query(checkUserQuery, [email]);
         if (existingUser.length > 0)
-            return { message: 'User already exists with the provided email.', status: 400 };
+            return { message: 'User already exists with the provided email.', status: 409 };
         const query = `INSERT INTO app.users(id, email, password) VALUES ($1, $2, $3) RETURNING *;`;
         const hashedPassword = yield (0, bcrypt_1.encrypt)(password);
         const values = [(0, uuid_1.v4)(), email, hashedPassword];
@@ -110,11 +110,11 @@ const repositoryCreate = (email, password) => __awaiter(void 0, void 0, void 0, 
         const { rowCount: assignRoleResult } = yield db_1.default.query(assignRoleQuery, assignRoleValues);
         if (assignRoleResult === 0)
             console.warn('Role assignment did not insert any rows. This may indicate the role was already assigned.');
-        return userCreate[0];
+        return { message: `User created successfully.`, status: 200, data: userCreate[0] };
     }
     catch (e) {
         return { message: `[Internal Server Error]: ${e.message}`, status: 500 };
     }
 });
-exports.repositoryCreate = repositoryCreate;
+exports.RepositoryCreateUser = RepositoryCreateUser;
 //# sourceMappingURL=sessions.repository.js.map

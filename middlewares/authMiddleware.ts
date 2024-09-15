@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { JWT_SECRET } from "../utils/config";
-import { verifyToken } from "../utils/jwt.js";
+import { verifyToken } from "../utils/jwt";
 import { JwtPayload, ParseResponseInterface } from "../types";
 
 // Auth Middleware
@@ -8,8 +8,8 @@ export const verifyBearerToken = (req: Request, res: Response<ParseResponseInter
     try {
         const token = req.header("Authorization")?.replace("Bearer ", "");
 
-        if (!token) return res.status(401).json({ message: "Access token not provided", status: 401 });
-        if (!JWT_SECRET) return res.status(500).json({ message: "JWT_SECRET is missing in the environment configuration", status: 500 });
+        if (!token) return res.status(401).json({ message: "Token de acceso no proporcionado.", status: 401 });
+        if (!JWT_SECRET) return res.status(500).json({ message: "JWT_SECRET falta de configuración.", status: 500 });
 
         const response = verifyToken(token);
 
@@ -18,20 +18,20 @@ export const verifyBearerToken = (req: Request, res: Response<ParseResponseInter
         req.user = response.data as JwtPayload;
         return next();
     } catch (e) {
-        return res.status(403).json({ message: "Unauthorized", status: 403 });
+        return res.status(403).json({ message: "No autorizado", status: 403 });
     }
 };
 
 // Permissions Middleware
 export const verifyUserPermissions = (req: Request, res: Response<ParseResponseInterface>, next: NextFunction) => {
     try {
-        if (!req.user) return res.status(401).json({ message: "Access token not provided", status: 401 });
+        if (!req.user) return res.status(401).json({ message: "Token de acceso no proporcionado.", status: 401 });
 
         const { roles } = req.user;
-        if (!roles || !roles.includes('A')) return res.status(403).json({ message: "Forbidden: Insufficient permissions", status: 403 });
+        if (!roles || !roles.includes('A')) return res.status(403).json({ message: "prohibido: permisos insuficientes.", status: 403 });
 
         return next();
     } catch (e) {
-        return res.status(403).json({ message: "Unauthorized", status: 403 });
+        return res.status(403).json({ message: "No autorizado", status: 403 });
     }
 }

@@ -18,6 +18,8 @@ const cors_1 = __importDefault(require("cors"));
 const db_1 = require("./database/db");
 const config_1 = require("./utils/config");
 const sessions_routes_1 = require("./routes/sessions.routes");
+const specialty_routes_1 = require("./routes/specialty.routes");
+const doctor_routes_1 = require("./routes/doctor.routes");
 const server = (0, express_1.default)();
 // Middlewares
 server.use(express_1.default.json());
@@ -27,8 +29,8 @@ server.use((0, cors_1.default)());
 // Routes
 server.use('/api', sessions_routes_1.router);
 // server.use('/api', patientsRoutes);
-// server.use('/api', doctorsRoutes);
-// server.use('/api', specialitesRoutes);
+server.use('/api', doctor_routes_1.router);
+server.use('/api', specialty_routes_1.router);
 // Start server
 (() => __awaiter(void 0, void 0, void 0, function* () {
     try {
