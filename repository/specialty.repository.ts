@@ -6,11 +6,11 @@ export const RepositorySpecialties = async () => {
         const query = `SELECT id, description FROM app.specialties;`;
         const { rows: specialties } = await conn.query(query);
 
-        if (specialties.length === 0) return { message: "No specialties found.", status: 404 };
+        if (specialties.length === 0) return { message: "No se encontraron especialidades.", status: 404, data: [] };
 
-        return { message: "Specialties successfully.", status: 200, data: specialties };
+        return { message: "Especialidades encontradas con éxito.", status: 200, data: specialties };
     } catch (e: any) {
-        return { message: `[Internal Server Error]: ${e.message}`, status: 500 };
+        return { message: `[Ocurrio un error inesperado]: ${e.message}`, status: 500, data: [] };
     }
 };
 
@@ -19,20 +19,16 @@ export const RepositoryNewSpecialty = async (description: string) => {
         const query1 = `SELECT id FROM app.specialties WHERE description = $1;`;
         const { rows: existingSpecialty } = await conn.query(query1, [description]);
 
-        if (existingSpecialty.length > 0) return { message: 'Specilaty already exists with the provided description.', status: 409 };
+        if (existingSpecialty.length > 0) return { message: 'La especialidad ya existe con el nombre proporcionado.', status: 409 };
 
         const query2 = `INSERT INTO app.specialties(id, description) VALUES ($1, $2) RETURNING *;`
 
         const { rows: newSpecialty } = await conn.query(query2, [uuidv4(), description]);
-        if (newSpecialty.length === 0) throw new Error('Specialty creation failed.');
+        if (newSpecialty.length === 0) throw new Error('Falló la creación.');
 
-        return {
-            message: "Specialty created successfully.",
-            status: 201,
-            data: newSpecialty[0],
-        };
+        return { message: "Especialidad creada con éxito.", status: 201, };
     } catch (e: any) {
-        return { message: `[Internal Server Error]: ${e.message}`, status: 500 };
+        return { message: `[Ocurrio un error inesperado]: ${e.message}`, status: 500 };
     }
 };
 
@@ -43,15 +39,15 @@ export const RepositoryDeleteSpecialtyById = async (id: string) => {
 
         const isAssigned = parseInt(assignmentCheck[0].count, 10) > 0;
 
-        if (isAssigned) return { message: 'Cannot delete specialty because it is assigned to a doctor.', status: 400 };
+        if (isAssigned) return { message: 'No se puede eliminar la especialidad porque está asignada a un médico.', status: 400 };
 
         const deleteQuery = `DELETE FROM app.specialties WHERE id = $1 RETURNING *;`;
         const { rows: deletedSpecialty } = await conn.query(deleteQuery, [id]);
 
-        if (deletedSpecialty.length === 0) return { message: 'Specialty not found.', status: 404 };
+        if (deletedSpecialty.length === 0) return { message: 'Especialidad no encontrada.', status: 404 };
 
-        return { message: 'Specialty deleted successfully.', status: 200 };
+        return { message: 'Especialidad eliminada correctamente.', status: 200 };
     } catch (e: any) {
-        return { message: `[Internal Server Error]: ${e.message}`, status: 500 };
+        return { message: `[Ocurrio un error inesperado]: ${e.message}`, status: 500 };
     }
 };

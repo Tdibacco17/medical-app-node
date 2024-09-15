@@ -27,11 +27,11 @@ export const RepositoryDoctors = async () => {
 
         const { rows: doctors } = await conn.query(query);
 
-        if (doctors.length === 0) return { message: "No doctors found.", status: 404 };
+        if (doctors.length === 0) return { message: "No se encontraron doctores.", status: 404, data: [] };
 
-        return { message: "Doctors successfully.", status: 200, data: doctors };
+        return { message: "Doctores encontrados con éxito.", status: 200, data: doctors };
     } catch (e: any) {
-        return { message: `[Internal Server Error]: ${e.message}`, status: 500 };
+        return { message: `[Ocurrio un error inesperado]: ${e.message}`, status: 500, data: [] };
     }
 };
 
@@ -63,11 +63,11 @@ export const RepositoryDoctorById = async (id: string) => {
 
         const { rows: doctors } = await conn.query(query, [id]);
 
-        if (doctors.length === 0) return { message: "Doctor not found.", status: 404 };
+        if (doctors.length === 0) return { message: "Doctor no encontrado.", status: 404, data: [] };
 
-        return { message: "Doctor retrieved successfully.", status: 200, data: doctors[0] };
+        return { message: "Doctor encontrado con éxito.", status: 200, data: doctors[0] };
     } catch (e: any) {
-        return { message: `[Internal Server Error]: ${e.message}`, status: 500 };
+        return { message: `[Ocurrio un error inesperado]: ${e.message}`, status: 500, data: [] };
     }
 };
 
@@ -76,12 +76,12 @@ export const RepositoryNewDoctor = async (name: string, lastname: string, dni: s
         const checkEmailQuery = 'SELECT id FROM app.doctors WHERE email = $1;';
         const { rows: existingDoctor } = await conn.query(checkEmailQuery, [email]);
 
-        if (existingDoctor.length > 0) return { message: 'A doctor with this email already exists.', status: 409 };
+        if (existingDoctor.length > 0) return { message: 'Ya existe un médico con este correo electrónico.', status: 409 };
 
         const checkDniQuery = 'SELECT id FROM app.doctors WHERE dni = $1;';
         const { rows: existingDoctorByDni } = await conn.query(checkDniQuery, [dni]);
 
-        if (existingDoctorByDni.length > 0) return { message: 'A doctor with this DNI already exists.', status: 409 };
+        if (existingDoctorByDni.length > 0) return { message: 'Ya existe un médico con este DNI.', status: 409 };
 
         const invalidSpecialties = [];
 
@@ -93,7 +93,7 @@ export const RepositoryNewDoctor = async (name: string, lastname: string, dni: s
             }
         }
 
-        if (invalidSpecialties.length > 0) return { message: `Specialties with IDs ${invalidSpecialties.join(', ')} do not exist.`, status: 404 };
+        if (invalidSpecialties.length > 0) return { message: `Las especialidades con ID ${invalidSpecialties.join(', ')} no existen.`, status: 404 };
 
         const insertDoctorQuery = `
             INSERT INTO app.doctors (id, name, lastname, dni, phone, email)
@@ -104,7 +104,7 @@ export const RepositoryNewDoctor = async (name: string, lastname: string, dni: s
         const values = [uuidv4(), name, lastname, dni, phone, email];
 
         const { rows: newDoctor } = await conn.query(insertDoctorQuery, values);
-        if (newDoctor.length === 0) throw new Error('Doctor creation failed.');
+        if (newDoctor.length === 0) throw new Error('Falló la creación.');
 
         const insertSpecialtyDoctorQuery = `
         INSERT INTO app.specialties_doctors (specialty_id, doctor_id)
@@ -117,12 +117,12 @@ export const RepositoryNewDoctor = async (name: string, lastname: string, dni: s
             const assignSpecialtyValues = [specialtyId, id];
             const { rowCount: assignSpecialtyResult } = await conn.query(insertSpecialtyDoctorQuery, assignSpecialtyValues);
 
-            if (assignSpecialtyResult === 0) console.warn(`Specialty ID ${specialtyId} assignment did not insert any rows. This may indicate the specialty was already assigned.`);
+            if (assignSpecialtyResult === 0) console.warn(`La asignación de ID de especialidad ${specialtyId} no insertó ninguna fila.`);
         }
 
-        return { message: 'Doctor created successfully.', status: 201, };
+        return { message: 'Doctor creado con éxito.', status: 201, };
     } catch (e: any) {
-        return { message: `[Internal Server Error]: ${e.message}`, status: 500 };
+        return { message: `[Ocurrio un error inesperado]: ${e.message}`, status: 500 };
     }
 };
 
@@ -131,7 +131,7 @@ export const RepositoryUpdateDoctorById = async (id: string, name: string, lastn
         const checkDoctorQuery = 'SELECT id FROM app.doctors WHERE id = $1;';
         const { rows: existingDoctor } = await conn.query(checkDoctorQuery, [id]);
 
-        if (existingDoctor.length === 0) return { message: "Doctor not found.", status: 404 };
+        if (existingDoctor.length === 0) return { message: "Doctor no encontrado.", status: 404 };
 
         const updateDoctorQuery = `
             UPDATE app.doctors
@@ -141,7 +141,7 @@ export const RepositoryUpdateDoctorById = async (id: string, name: string, lastn
         const updateValues = [name, lastname, dni, phone, email, id];
         const { rowCount: updateRowCount } = await conn.query(updateDoctorQuery, updateValues);
 
-        if (updateRowCount === 0) throw new Error("Doctor update failed. No rows affected.")
+        if (updateRowCount === 0) throw new Error("La actualización del médico falló.")
 
         const deleteSpecialtiesQuery = 'DELETE FROM app.specialties_doctors WHERE doctor_id = $1;';
         await conn.query(deleteSpecialtiesQuery, [id]);
@@ -157,7 +157,7 @@ export const RepositoryUpdateDoctorById = async (id: string, name: string, lastn
             }
         }
 
-        if (invalidSpecialties.length > 0) return { message: `Specialties with IDs ${invalidSpecialties.join(', ')} do not exist.`, status: 404 };
+        if (invalidSpecialties.length > 0) return { message: `Las especialidades con ID ${invalidSpecialties.join(', ')} no existen.`, status: 404 };
 
         const insertSpecialtyDoctorQuery = `
         INSERT INTO app.specialties_doctors (specialty_id, doctor_id)
@@ -168,12 +168,12 @@ export const RepositoryUpdateDoctorById = async (id: string, name: string, lastn
             const assignSpecialtyValues = [specialtyId, id];
             const { rowCount: assignSpecialtyResult } = await conn.query(insertSpecialtyDoctorQuery, assignSpecialtyValues);
 
-            if (assignSpecialtyResult === 0) console.warn(`Specialty ID ${specialtyId} assignment did not insert any rows. This may indicate the specialty was already assigned.`);
+            if (assignSpecialtyResult === 0) console.warn(`La asignación de ID de especialidad ${specialtyId} no insertó ninguna fila.`);
         }
 
-        return { message: 'Doctor updated successfully.', status: 200 };
+        return { message: 'Doctor actualizado con éxito.', status: 200 };
     } catch (e: any) {
-        return { message: `[Internal Server Error]: ${e.message}`, status: 500 };
+        return { message: `[Ocurrio un error inesperado]: ${e.message}`, status: 500 };
     }
 };
 
@@ -182,10 +182,10 @@ export const RepositoryDeleteDoctorById = async (id: string) => {
         const deleteQuery = `DELETE FROM app.doctors WHERE id = $1 RETURNING *;`;
         const { rows: deletedDoctor } = await conn.query(deleteQuery, [id]);
 
-        if (deletedDoctor.length === 0) return { message: 'Doctor not found.', status: 404 };
+        if (deletedDoctor.length === 0) return { message: 'Doctor no encontrado.', status: 404 };
 
-        return { message: 'Doctor deleted successfully.', status: 200 };
+        return { message: 'Doctor elminado con éxito.', status: 200 };
     } catch (e: any) {
-        return { message: `[Internal Server Error]: ${e.message}`, status: 500 };
+        return { message: `[Ocurrio un error inesperado]: ${e.message}`, status: 500 };
     }
 };

@@ -4,7 +4,7 @@ import jwt, { Algorithm } from "jsonwebtoken";
 
 export const tokenSign = (data: JwtPayload): TokenResponse => {
     if (!JWT_SECRET || !JWT_ALGORITHM || !JWT_EXPIRE) {
-        return { message: "JWT_SECRET, JWT_ALGORITHM or JWT_EXPIRE falta de configuracion.", status: 500 };
+        return { message: "JWT_SECRET, JWT_ALGORITHM o JWT_EXPIRE falta de configuracion.", status: 500 };
     }
     try {
 
@@ -13,9 +13,9 @@ export const tokenSign = (data: JwtPayload): TokenResponse => {
             expiresIn: JWT_EXPIRE,
         }
         );
-        return { message: 'Token created successfully', data: token, status: 200 }
+        return { message: 'Token creado con éxito.', data: token, status: 200 }
     } catch (e: any) {
-        return { message: `Failed to create token: ${e.message}`, status: 500 };
+        return { message: `Fallo la creación del token: ${e.message}`, status: 500 };
     }
 };
 
@@ -26,8 +26,8 @@ export const verifyToken = (token: string): TokenResponse => {
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
-        return { message: 'Token decoded successfully', data: decoded, status: 200 };
+        return { message: 'Token decodificado con éxito.', data: decoded, status: 200 };
     } catch (e: any) {
-        return { message: `Failed to decode token: ${e.message}`, status: 500 };
+        return { message: `Fallo la decodificacíon del token: ${e.message}`, status: 500 };
     }
 };
