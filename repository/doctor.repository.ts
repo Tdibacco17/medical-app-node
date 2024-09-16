@@ -27,11 +27,11 @@ export const RepositoryDoctors = async () => {
 
         const { rows: doctors } = await conn.query(query);
 
-        if (doctors.length === 0) return { message: "No se encontraron doctores.", status: 404, data: [] };
+        if (doctors.length === 0) return { message: "No se encontraron doctores.", status: 404};
 
         return { message: "Doctores encontrados con éxito.", status: 200, data: doctors };
     } catch (e: any) {
-        return { message: `[Ocurrio un error inesperado]: ${e.message}`, status: 500, data: [] };
+        return { message: `[Ocurrio un error inesperado]: ${e.message}`, status: 500 };
     }
 };
 
@@ -63,11 +63,11 @@ export const RepositoryDoctorById = async (id: string) => {
 
         const { rows: doctors } = await conn.query(query, [id]);
 
-        if (doctors.length === 0) return { message: "Doctor no encontrado.", status: 404, data: [] };
+        if (doctors.length === 0) return { message: "Doctor no encontrado.", status: 404 };
 
         return { message: "Doctor encontrado con éxito.", status: 200, data: doctors[0] };
     } catch (e: any) {
-        return { message: `[Ocurrio un error inesperado]: ${e.message}`, status: 500, data: [] };
+        return { message: `[Ocurrio un error inesperado]: ${e.message}`, status: 500 };
     }
 };
 

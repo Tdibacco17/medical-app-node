@@ -6,11 +6,11 @@ export const RepositorySpecialties = async () => {
         const query = `SELECT id, description FROM app.specialties;`;
         const { rows: specialties } = await conn.query(query);
 
-        if (specialties.length === 0) return { message: "No se encontraron especialidades.", status: 404, data: [] };
+        if (specialties.length === 0) return { message: "No se encontraron especialidades.", status: 404 };
 
         return { message: "Especialidades encontradas con éxito.", status: 200, data: specialties };
     } catch (e: any) {
-        return { message: `[Ocurrio un error inesperado]: ${e.message}`, status: 500, data: [] };
+        return { message: `[Ocurrio un error inesperado]: ${e.message}`, status: 500 };
     }
 };
 
