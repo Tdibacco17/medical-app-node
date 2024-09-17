@@ -35,41 +35,41 @@ export const RepositoryDoctors = async () => {
     }
 };
 
-export const RepositoryDoctorById = async (id: string) => {
-    try {
-        const query = `
-            SELECT 
-                d.id, 
-                d.name, 
-                d.lastname, 
-                d.dni, 
-                d.phone, 
-                d.email,
-                COALESCE(
-                    ARRAY_AGG(s.description) FILTER (WHERE s.description IS NOT NULL),
-                    ARRAY['No specialties assigned']
-                ) AS specialty_descriptions
-            FROM 
-                app.doctors d
-            LEFT JOIN 
-                app.specialties_doctors sd ON d.id = sd.doctor_id
-            LEFT JOIN 
-                app.specialties s ON sd.specialty_id = s.id
-            WHERE 
-                d.id = $1
-            GROUP BY 
-                d.id, d.name, d.lastname, d.dni, d.phone, d.email;
-        `;
+// export const RepositoryDoctorById = async (id: string) => {
+//     try {
+//         const query = `
+//             SELECT 
+//                 d.id, 
+//                 d.name, 
+//                 d.lastname, 
+//                 d.dni, 
+//                 d.phone, 
+//                 d.email,
+//                 COALESCE(
+//                     ARRAY_AGG(s.description) FILTER (WHERE s.description IS NOT NULL),
+//                     ARRAY['No specialties assigned']
+//                 ) AS specialty_descriptions
+//             FROM 
+//                 app.doctors d
+//             LEFT JOIN 
+//                 app.specialties_doctors sd ON d.id = sd.doctor_id
+//             LEFT JOIN 
+//                 app.specialties s ON sd.specialty_id = s.id
+//             WHERE 
+//                 d.id = $1
+//             GROUP BY 
+//                 d.id, d.name, d.lastname, d.dni, d.phone, d.email;
+//         `;
 
-        const { rows: doctors } = await conn.query(query, [id]);
+//         const { rows: doctors } = await conn.query(query, [id]);
 
-        if (doctors.length === 0) return { message: "Doctor no encontrado.", status: 404 };
+//         if (doctors.length === 0) return { message: "Doctor no encontrado.", status: 404 };
 
-        return { message: "Doctor encontrado con éxito.", status: 200, data: doctors[0] };
-    } catch (e: any) {
-        return { message: `[Ocurrio un error inesperado]: ${e.message}`, status: 500 };
-    }
-};
+//         return { message: "Doctor encontrado con éxito.", status: 200, data: doctors[0] };
+//     } catch (e: any) {
+//         return { message: `[Ocurrio un error inesperado]: ${e.message}`, status: 500 };
+//     }
+// };
 
 export const RepositoryNewDoctor = async (name: string, lastname: string, dni: string, phone: string, email: string, specialty_ids: string[]) => {
     try {

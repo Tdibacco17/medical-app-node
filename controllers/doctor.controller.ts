@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ParseResponseInterface } from "../types";
-import { RepositoryDeleteDoctorById, RepositoryDoctorById, RepositoryDoctors, RepositoryNewDoctor, RepositoryUpdateDoctorById } from "../repository/doctor.repository";
+import { RepositoryDeleteDoctorById, RepositoryDoctors, RepositoryNewDoctor, RepositoryUpdateDoctorById } from "../repository/doctor.repository";
 import { emailRegex, uuidV4Regex } from "../utils/regex";
 
 export const GetDoctors = async (req: Request, res: Response<ParseResponseInterface>) => {
@@ -12,19 +12,19 @@ export const GetDoctors = async (req: Request, res: Response<ParseResponseInterf
     }
 };
 
-export const GetDoctorById = async (req: Request, res: Response<ParseResponseInterface>) => {
-    try {
-        const { id } = req.params;
+// export const GetDoctorById = async (req: Request, res: Response<ParseResponseInterface>) => {
+//     try {
+//         const { id } = req.params;
 
-        if (!id) return res.status(401).json({ message: "Id no proporcionado.", status: 401 });
-        if (!uuidV4Regex.test(id)) return res.status(400).json({ message: "Formato Id no valido.", status: 400 });
+//         if (!id) return res.status(401).json({ message: "Id no proporcionado.", status: 401 });
+//         if (!uuidV4Regex.test(id)) return res.status(400).json({ message: "Formato Id no valido.", status: 400 });
 
-        const response = await RepositoryDoctorById(id);
-        return res.status(200).json(response);
-    } catch (e: any) {
-        return res.status(500).json({ message: `[Error interno del servidor]: ${e.message}`, status: 500 });
-    }
-};
+//         const response = await RepositoryDoctorById(id);
+//         return res.status(200).json(response);
+//     } catch (e: any) {
+//         return res.status(500).json({ message: `[Error interno del servidor]: ${e.message}`, status: 500 });
+//     }
+// };
 
 export const CreateNewDoctor = async (req: Request, res: Response<ParseResponseInterface>) => {
     try {
